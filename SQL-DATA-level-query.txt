@@ -1,0 +1,164 @@
+CREATE TABLE Order_history(
+  Order_ID int NOT NULL AUTO_INCREMENT,
+  User_Id VARCHAR(25),
+  Product_Id int,
+  Quantity int,
+  PRIMARY KEY (Order_ID)
+);
+
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test1',12,3);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test2',14,3);
+INSERT INTO Order_history(User_Id,Product_Id)
+VALUES('test3',15);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test4',12,9);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test5',12,3);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test6',14,10);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test7',15,7);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test8',14,10);
+
+-- 1. where 2. GHO (group by, having, order by) 3. limit
+
+
+-- get all records
+SELECT * from Order_history;
+
+-- get all records with record limit
+SELECT * from Order_history limit 3;
+
+-- get distinct record. remove duplicate values from the column
+SELECT distinct  Quantity from Order_history;
+
+-- get specefic columns
+SELECT User_Id,Product_Id,Quantity from Order_history; 
+
+-- Aliases name (as) for change col name
+SELECT User_Id as userid,Product_Id,Quantity from Order_history;
+
+-- get specefic record with where condition
+SELECT * from Order_history WHERE Product_Id=12;
+
+-- get specefic record with where with in condition
+SELECT * from Order_history WHERE Product_Id in (12,14);
+
+-- between
+SELECT * from Order_history WHERE Quantity BETWEEN 3 and 7;
+
+-- --------------------------------------------------------
+-- and,or,not
+-- single column evaluate with or
+SELECT * from Order_history WHERE Product_Id=12 or Product_Id=14;
+-- multiple column evaluate with and 
+SELECT * from Order_history WHERE Product_Id=12 and Quantity=3;
+-- not
+SELECT * from Order_history WHERE not Product_Id=12;
+SELECT * from Order_history WHERE Product_Id != 12;
+
+-- is, null
+SELECT * from Order_history WHERE Quantity is null;
+SELECT * from Order_history WHERE Quantity is not null;
+
+-- ----------------------------------------------------------
+  
+-- order by
+SELECT * from Order_history WHERE Product_Id=12 or Product_Id=14 order by Product_Id asc;
+SELECT * from Order_history WHERE Product_Id=12 or Product_Id=14 order by Product_Id desc;
+
+-- count, sum, avg are aggregate functions
+-- count, having. having is used to filter the result table/where is used to result the actual table
+SELECT Product_Id,count(*) from Order_history group by Product_Id having count(*) > 2;
+
+-- count, group by with having with order by
+SELECT count(Order_ID) as product_count from Order_history;
+SELECT Product_Id,count(*) as count from Order_history group by Product_Id;
+SELECT Product_Id,count(*) as count from Order_history group by Product_Id order by Product_Id desc;
+SELECT Product_Id,count(*) from Order_history group by Product_Id having count(*) > 2 order by Product_Id desc ;
+
+-- sum, group by with having with order by
+SELECT sum(Quantity) as quantity_sum from Order_history;
+SELECT Product_Id,sum(Quantity) as Quantity_sum from Order_history group by Product_Id;
+SELECT Product_Id,sum(Quantity) as Quantity_sum from Order_history group by Product_Id having Quantity_sum> 13 order by Quantity_sum desc ;
+
+-- avg
+SELECT avg(Quantity) from Order_history;
+SELECT avg(Product_Id)  from Order_history group by Product_Id;
+
+-- ----------------------------------------------------------
+-- min and max
+select min(Quantity) as minimum_qty from Order_history;
+select max(Quantity) as maximum_qty from Order_history;
+
+-- sub query. sub query will run first
+select * from Order_history where Quantity in (select min(Quantity) as minimum_qty from Order_history);
+select * from Order_history where Quantity in (select max(Quantity) as maximum_qty from Order_history);
+
+-- ----------------------------------------------------------
+
+drop table Order_history;
+
+CREATE TABLE Order_history(
+  Order_Id int NOT NULL AUTO_INCREMENT,
+  User_Id VARCHAR(25),
+  Product_Id int,
+  Quantity int,
+  PRIMARY KEY (Order_Id)
+);
+CREATE TABLE Order_states(
+  Order_Id int NOT NULL,
+  Shipped VARCHAR(25),
+  Out_for_delivery VARCHAR(20),
+  Delivered VARCHAR(20),
+  FOREIGN KEY (Order_Id) REFERENCES Order_history(Order_Id)
+
+);
+
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test1',12,3);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test2',14,3);
+INSERT INTO Order_history(User_Id,Product_Id)
+VALUES('test3',15);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test4',12,9);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test5',12,3);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test6',14,10);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test7',15,7);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test8',14,10);
+ 
+INSERT INTO Order_states(Order_Id,Shipped,Out_for_delivery,delivered)
+VALUES(1,'Y','N','N');
+INSERT INTO Order_states(Order_Id,Shipped,Out_for_delivery,delivered)
+VALUES(2,'Y','Y','Y');
+SELECT * FROM Order_history;
+SELECT * FROM Order_states;
+
+
+-- JOINS
+-- INNER JOIN: Returns records that have matching values in both tables
+-- LEFT JOIN: Returns all records from the left table, and the matched records from the right table
+-- RIGHT JOIN: Returns all records from the right table, and the matched records from the left table
+-- CROSS JOIN: Returns all records from both tables
+
+
+-- INNER JOIN 
+select * from Order_history as oh inner join Order_states as os on oh.Order_Id = os.Order_Id;
+
+-- LEFT JOIN 
+select * from Order_history as oh left join Order_states as os on oh.Order_Id = os.Order_Id;
+
+-- RIGHT JOIN 
+select * from Order_history as oh right join Order_states as os on oh.Order_Id = os.Order_Id;
+
+-- CROSS JOIN 
+select * from Order_history as oh cross join Order_states as os on oh.Order_Id = os.Order_Id;
+ 

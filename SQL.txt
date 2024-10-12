@@ -1,0 +1,59 @@
+1. =====================SPECIFIC COLUMN DISTINCT================================
+SELECT DISTINCT materialcode, uom, materialdescription, MaterialPrice, hnsc_code, cgst_taxrate, sgst_taxrate, igst_taxrate
+FROM (
+    SELECT 
+        a.matnr AS materialcode,
+        a.mtart AS materialtype,
+        ta.msehl AS uom,
+        t.maktg AS materialdescription,
+        c.steuc AS hnsc_code,
+        COALESCE(g."CGST TAX", '9') AS cgst_taxrate,
+        COALESCE(g."SGST TAX", '9') AS sgst_taxrate,
+        COALESCE(g."IGST TAX", '18') AS igst_taxrate,
+        0 AS MaterialPrice
+    FROM mara a
+    INNER JOIN marc c ON c.matnr = a.matnr
+    INNER JOIN makt t ON t.matnr = a.matnr
+    INNER JOIN mbew w ON w.matnr = a.matnr
+    LEFT JOIN t006a ta ON ta.msehi = a.meins
+    LEFT JOIN marg g ON g."HSNC CODE" = c.steuc
+    WHERE c.werks = @in_plantcode
+      AND a.mandt = @in_businesscode
+      AND ta.mandt = @in_businesscode
+      AND ta.spras = 'E'
+      AND c.steuc != ''
+    LIMIT 25
+) AS result;
+
+2. =====================GET ROW NUMBER================================
+ SELECT 
+        vsh1.service_id,
+        vsh1.md_by,
+        vsh1.md_dt,
+        ROW_NUMBER() OVER (PARTITION BY vsh1.service_id ORDER BY vsh1.md_dt DESC) AS rn
+    FROM 
+        vt_service_history vsh1;
+
+3. =====================ORDER BY COLUMN PROBLEM================================
+
+SELECT 
+    s.service_id,
+    s.service_name,
+    vsh.md_by,
+    vsh.md_dt
+FROM 
+    vt_service_user_access sa 
+INNER JOIN 
+    vt_service_master s ON sa.service_id = s.service_id
+LEFT JOIN (
+    SELECT 
+        vsh1.service_id,
+        vsh1.md_by,
+        vsh1.md_dt,
+        ROW_NUMBER() OVER (PARTITION BY vsh1.service_id ORDER BY vsh1.md_dt DESC) AS rn
+    FROM 
+        vt_service_history vsh1
+) vsh ON vsh.service_id = s.service_id AND vsh.rn = 1
+WHERE 
+    sa.user_id = 'V0854171' 
+    AND s.active_status = 'A' ORDER BY SUBSTRING(s.service_id FROM '[0-9]+')::INT ASC;

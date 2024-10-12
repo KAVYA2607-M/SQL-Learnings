@@ -1,0 +1,40 @@
+CREATE TABLE Order_history(
+  Order_ID int NOT NULL AUTO_INCREMENT,
+  User_Id VARCHAR(25),
+  Product_Id int,
+  Quantity int,
+  PRIMARY KEY (Order_id)
+);
+
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test1',12,3);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test2',14,3);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test3',15,5);
+
+UPDATE Order_history
+SET Quantity=6
+WHERE  Order_ID=2;
+
+DELETE FROM Order_history WHERE Order_ID=2;
+
+DELETE FROM Order_history;
+
+
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test1',12,3);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test2',14,3);
+
+TRUNCATE TABLE Order_history;
+
+
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test1',12,3);
+INSERT INTO Order_history(User_Id,Product_Id,Quantity)
+VALUES('test2',14,3);
+
+DROP TABLE Order_history;
+
+SELECT * from Order_history;
